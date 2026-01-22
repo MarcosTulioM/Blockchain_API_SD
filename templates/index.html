@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Dashboard</title>
+    <!-- Fonte padrão do sistema -->
+    <style>
+        :root {
+            /* Paleta Simplificada */
+            --bg-color: #f8f9fa;
+            /* Fundo claro */
+            --card-bg: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --accent-color: #0d6efd;
+            /* Azul padrão */
+            --accent-hover: #0b5ed7;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        /* Paineis e Cards */
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
+        }
+
+        /* Controles e Inputs */
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            color: var(--text-primary);
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5c636a;
+        }
+
+        .btn-purple {
+            background-color: #6f42c1;
+        }
+
+        .btn-purple:hover {
+            background-color: #59359a;
+        }
+
+        /* Toggles para Automação */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-color);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-status {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .status-on {
+            color: var(--success-color);
+        }
+
+        .status-off {
+            color: var(--text-secondary);
+        }
+
+        /* Blockchain Visual */
+        .chain-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .block {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .block-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .block-hash {
+            font-family: monospace;
+            background: var(--bg-color);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #d63384;
+            word-break: break-all;
+        }
+
+        .block-txs {
+            margin-top: 10px;
+            background: var(--bg-color);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tx-item {
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+            padding: 5px 0;
+        }
+
+        .tx-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Notificações */
+        #notification-area {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: #343a40;
+            /* Toast escuro para contraste */
+            color: #fff;
+            padding: 12px 20px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Blockchain</h1>
+        <div id="connection-status" style="color: var(--success-color); font-weight: bold;">● Conectado</div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Controls -->
+        <div class="sidebar">
+            <!-- Automation Panel -->
+            <div class="panel">
+                <h2>Automação</h2>
+
+                <div class="toggle-container">
+                    <label style="margin:0; cursor:pointer;" for="auto-mine-check">Auto-Mineração</label>
+                    <input type="checkbox" id="auto-mine-check">
+                    <span id="mine-status" class="toggle-status status-off">OFF</span>
+                </div>
+
+                <div class="toggle-container">
+                    <label style="margin:0; cursor:pointer;" for="auto-consensus-check">Auto-Consenso</label>
+                    <input type="checkbox" id="auto-consensus-check">
+                    <span id="consensus-status" class="toggle-status status-off">OFF</span>
+                </div>
+            </div>
+
+            <!-- Manual Actions -->
+            <div class="panel" style="margin-top: 20px;">
+                <h2>Ações Manuais</h2>
+                <button onclick="mineBlock()" style="margin-bottom: 10px;">Minerar Bloco (Mine)</button>
+                <button onclick="resolveConflicts()" class="btn-purple" style="margin-bottom: 10px;">Consenso
+                    (Resolve)</button>
+                <button onclick="fetchChain()" class="btn-secondary">Atualizar Chain</button>
+            </div>
+
+            <!-- Transaction Form -->
+            <div class="panel" style="margin-top: 20px;">
+                <h2>Nova Transação</h2>
+                <div class="control-group">
+                    <label>Remetente</label>
+                    <input type="text" id="tx-sender" placeholder="Alice">
+                </div>
+                <div class="control-group">
+                    <label>Destinatário</label>
+                    <input type="text" id="tx-recipient" placeholder="Bob">
+                </div>
+                <div class="control-group">
+                    <label>Valor</label>
+                    <input type="number" id="tx-amount" placeholder="0.00">
+                </div>
+                <button onclick="submitTransaction()">Criar Transação</button>
+            </div>
+
+            <!-- Node Management -->
+            <div class="panel" style="margin-top: 20px;">
+                <h2>Nós (Peers)</h2>
+                <div class="control-group">
+                    <label>Endereço do Nó</label>
+                    <input type="text" id="node-address" placeholder="http://localhost:5001">
+                </div>
+                <button onclick="registerNode()" class="btn-secondary">Registrar Nó</button>
+            </div>
+        </div>
+
+        <!-- Main Content: Chain View -->
+        <div class="main-content">
+            <div class="panel">
+                <h2>Blockchain Ledger</h2>
+                <div id="chain-display" class="chain-container">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        Carregando Blockchain...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-area"></div>
+
+    <script>
+        // --- Configuração ---
+        const API_BASE = window.location.origin;
+
+        // --- State ---
+        let autoMineInterval = null;
+        let autoConsensusInterval = null;
+
+        // --- On Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchChain();
+            setupAutomationListeners();
+        });
+
+        // --- Funções Principais ---
+
+        async function fetchChain() {
+            try {
+                const response = await fetch(`${API_BASE}/chain`);
+                if (!response.ok) throw new Error(response.statusText);
+                const data = await response.json();
+                renderChain(data.chain);
+            } catch (error) {
+                console.error(error);
+                showToast(`Erro ao buscar chain: ${error.message}`, 'error');
+            }
+        }
+
+        async function mineBlock() {
+            try {
+                showToast('Minerando bloco...', 'info');
+                const response = await fetch(`${API_BASE}/mine`);
+                const data = await response.json();
+                showToast(`Bloco ${data.index} minerado!`, 'success');
+                fetchChain();
+            } catch (error) {
+                showToast('Erro na mineração', 'error');
+            }
+        }
+
+        async function resolveConflicts() {
+            try {
+                showToast('Verificando conflitos...', 'info');
+                const response = await fetch(`${API_BASE}/nodes/resolve`);
+                const data = await response.json();
+                if (data.message.includes('replaced')) {
+                    showToast('Chain substituída!', 'warning');
+                    fetchChain();
+                } else {
+                    showToast('Sem conflitos.', 'success');
+                }
+            } catch (error) {
+                showToast('Erro no consenso', 'error');
+            }
+        }
+
+        async function submitTransaction() {
+            const sender = document.getElementById('tx-sender').value;
+            const recipient = document.getElementById('tx-recipient').value;
+            const amount = document.getElementById('tx-amount').value;
+
+            if (!sender || !recipient || !amount) {
+                showToast('Preencha todos os campos da transação', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/transactions/new`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender, recipient, amount })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || response.statusText);
+                }
+
+                const data = await response.json();
+                showToast(data.message, 'success');
+                document.getElementById('tx-amount').value = '';
+            } catch (error) {
+                console.error(error);
+                showToast(`Erro: ${error.message}`, 'error');
+            }
+        }
+
+        async function registerNode() {
+            const address = document.getElementById('node-address').value;
+            if (!address) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/nodes/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nodes: [address] })
+                });
+                const data = await response.json();
+                showToast(data.message, 'success');
+                document.getElementById('node-address').value = '';
+            } catch (error) {
+                showToast('Erro ao registrar nó', 'error');
+            }
+        }
+
+        // --- Logica de Automação ---
+        function setupAutomationListeners() {
+            const mineCheck = document.getElementById('auto-mine-check');
+            const mineStatus = document.getElementById('mine-status');
+
+            mineCheck.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    mineStatus.textContent = "ON";
+                    mineStatus.classList.remove('status-off');
+                    mineStatus.classList.add('status-on');
+                    startAutoMine();
+                } else {
+                    mineStatus.textContent = "OFF";
+                    mineStatus.classList.remove('status-on');
+                    mineStatus.classList.add('status-off');
+                    stopAutoMine();
+                }
+            });
+
+            const consensusCheck = document.getElementById('auto-consensus-check');
+            const consensusStatus = document.getElementById('consensus-status');
+
+            consensusCheck.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    consensusStatus.textContent = "ON";
+                    consensusStatus.classList.remove('status-off');
+                    consensusStatus.classList.add('status-on');
+                    startAutoConsensus();
+                } else {
+                    consensusStatus.textContent = "OFF";
+                    consensusStatus.classList.remove('status-on');
+                    consensusStatus.classList.add('status-off');
+                    stopAutoConsensus();
+                }
+            });
+        }
+
+        function startAutoMine() {
+            showToast('Auto-mineração ligada (5s)');
+            mineBlock();
+            autoMineInterval = setInterval(mineBlock, 5000);
+        }
+
+        function stopAutoMine() {
+            if (autoMineInterval) clearInterval(autoMineInterval);
+            showToast('Auto-mineração parada');
+        }
+
+        function startAutoConsensus() {
+            showToast('Auto-consenso ligado (10s)');
+            autoConsensusInterval = setInterval(resolveConflicts, 10000);
+        }
+
+        function stopAutoConsensus() {
+            if (autoConsensusInterval) clearInterval(autoConsensusInterval);
+            showToast('Auto-consenso parado');
+        }
+
+
+        // --- Renderização ---
+
+        function renderChain(chain) {
+            const container = document.getElementById('chain-display');
+            container.innerHTML = '';
+
+            const reversedChain = [...chain].reverse();
+
+            reversedChain.forEach(block => {
+                const blockEl = document.createElement('div');
+                blockEl.className = 'block';
+
+                const date = new Date(block.timestamp * 1000).toLocaleString('pt-BR');
+
+                let transactionsHtml = '';
+                if (block.transactions.length > 0) {
+                    transactionsHtml = block.transactions.map(tx => `
+                    <div class="tx-item">
+                        <strong>${tx.sender}</strong> enviou <strong>${tx.amount}</strong> para <strong>${tx.recipient}</strong>
+                    </div>
+                `).join('');
+                } else {
+                    transactionsHtml = '<div class="tx-item" style="font-style:italic; color: #adb5bd;">Nenhuma transação</div>';
+                }
+
+                blockEl.innerHTML = `
+                <div class="block-header">
+                    <span>Bloco #${block.index}</span>
+                    <span style="font-weight:normal; font-size: 0.9rem;">${date}</span>
+                </div>
+                <div class="block-info">
+                    Hash Anterior: <span class="block-hash">${block.previous_hash}</span>
+                </div>
+                <div class="block-info">
+                   Proof: <span style="font-family: monospace;">${block.proof}</span>
+                </div>
+                <div class="block-txs">
+                    <div style="font-size: 0.85rem; margin-bottom: 5px; font-weight: bold;">Transações (${block.transactions.length})</div>
+                    ${transactionsHtml}
+                </div>
+            `;
+                container.appendChild(blockEl);
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const area = document.getElementById('notification-area');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+
+            toast.textContent = message;
+            area.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+    </script>
+
+</body>
+
+</html>
