@@ -249,13 +249,12 @@
 
     <header>
         <h1>Blockchain</h1>
-        <div id="connection-status" style="color: var(--success-color); font-weight: bold;">● Conectado</div>
     </header>
 
     <div class="container">
-        <!-- Sidebar Controls -->
+        <!-- Sidebar de Controles -->
         <div class="sidebar">
-            <!-- Automation Panel -->
+            <!-- Panel de Automação -->
             <div class="panel">
                 <h2>Automação</h2>
 
@@ -272,7 +271,7 @@
                 </div>
             </div>
 
-            <!-- Manual Actions -->
+            <!-- Ações Manuais -->
             <div class="panel" style="margin-top: 20px;">
                 <h2>Ações Manuais</h2>
                 <button onclick="mineBlock()" style="margin-bottom: 10px;">Minerar Bloco (Mine)</button>
@@ -281,16 +280,16 @@
                 <button onclick="fetchChain()" class="btn-secondary">Atualizar Chain</button>
             </div>
 
-            <!-- Transaction Form -->
+            <!-- Formulário de Transação -->
             <div class="panel" style="margin-top: 20px;">
                 <h2>Nova Transação</h2>
                 <div class="control-group">
                     <label>Remetente</label>
-                    <input type="text" id="tx-sender" placeholder="Alice">
+                    <input type="text" id="tx-sender" placeholder="Marcos">
                 </div>
                 <div class="control-group">
                     <label>Destinatário</label>
-                    <input type="text" id="tx-recipient" placeholder="Bob">
+                    <input type="text" id="tx-recipient" placeholder="Túlio">
                 </div>
                 <div class="control-group">
                     <label>Valor</label>
@@ -299,7 +298,7 @@
                 <button onclick="submitTransaction()">Criar Transação</button>
             </div>
 
-            <!-- Node Management -->
+            <!-- Gestão de Nós -->
             <div class="panel" style="margin-top: 20px;">
                 <h2>Nós (Peers)</h2>
                 <div class="control-group">
@@ -329,11 +328,11 @@
         // --- Configuração ---
         const API_BASE = window.location.origin;
 
-        // --- State ---
+        // --- Estado ---
         let autoMineInterval = null;
         let autoConsensusInterval = null;
 
-        // --- On Load ---
+        // --- Eventos ---
         document.addEventListener('DOMContentLoaded', () => {
             fetchChain();
             setupAutomationListeners();
